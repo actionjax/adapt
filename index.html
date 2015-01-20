@@ -3,7 +3,7 @@
 <style>
 
 svg {
-  font: 10px sans-serif;
+  font: 12px sans-serif;
 }
 
 .bar {
@@ -30,6 +30,15 @@ svg {
   shape-rendering: crispEdges;
 }
 
+.grid .tick {
+    stroke: lightgrey;
+    stroke-opacity: 0.7;
+    shape-rendering: crispEdges;
+}
+.grid path {
+          stroke-width: 0;
+}
+
 </style>
 <body>
 <script src="js/d3.v3.min.js"></script>
@@ -46,7 +55,18 @@ d3.csv("data/adapt_prediction10days.csv",
 
       focusGraph.attr("width", barwidth)
       focusGraph.attr("x", function(d) { return x(d.dtoi) - (barwidth)/2; })
+
       focus.select(".x.axis").call(xAxis);
+    }
+
+    // function for the x grid lines
+    // function make_x_axis() {
+    //     return d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format('%Y-%m-%d')).ticks(5)
+    // }
+
+    // function for the y grid lines
+    function make_y_axis() {
+      return d3.svg.axis().scale(y).orient("left").ticks(5)
     }
 
     var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
@@ -59,7 +79,7 @@ d3.csv("data/adapt_prediction10days.csv",
       d.obshigh = +d.obshigh;
     });
 
-    var margin = {top: 10, right: 10, bottom: 100, left: 40};
+    var margin = {top: 50, right: 10, bottom: 100, left: 40};
     var margin2 = {top: 430, right: 10, bottom: 20, left: 40};
     var width = 960 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
@@ -70,9 +90,9 @@ d3.csv("data/adapt_prediction10days.csv",
     var y = d3.scale.linear().range([height, 0]);
     var y2 = d3.scale.linear().range([height2, 0]);
 
-    var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format('%Y-%m-%d'));
+    var xAxis = d3.svg.axis().scale(x).orient("bottom").tickFormat(d3.time.format('%Y-%m-%d')).ticks(5);
     var xAxis2 = d3.svg.axis().scale(x2).orient("bottom").tickFormat(d3.time.format('%Y-%m-%d'));
-    var yAxis = d3.svg.axis().scale(y).orient("left");
+    var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
     var brush = d3.svg.brush().x(x2).on("brush", brushed);
 
@@ -96,7 +116,7 @@ d3.csv("data/adapt_prediction10days.csv",
         .attr("id", "clip")
       .append("rect")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height);    
 
     var focus = svg.append("g")
         .attr("class", "focus")
@@ -111,6 +131,31 @@ d3.csv("data/adapt_prediction10days.csv",
               d3.max(data.map(function(d) { return d.obshigh; }))]);
     x2.domain(x.domain());
     y2.domain(y.domain());
+
+    // Add the title
+    focus.append("text")
+        .attr("x", (width / 2))     
+        .attr("y", 0 - (margin.top / 2))
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text("Adapt Algorithm");        
+
+    // Draw the x Grid lines
+    // focus.append("g")
+    //     .attr("class", "grid")
+    //     .attr("transform", "translate(0," + height + ")")
+    //     .call(make_x_axis()
+    //         .tickSize(-height, 0, 0)
+    //         .tickFormat("")
+    //     );
+
+    // Draw the y Grid lines
+    focus.append("g")            
+        .attr("class", "grid")
+        .call(make_y_axis()
+            .tickSize(-width, 0, 0)
+            .tickFormat("")
+        );  
 
     // blah
     focus.append("path")
@@ -128,7 +173,7 @@ d3.csv("data/adapt_prediction10days.csv",
         .call(yAxis)
       .append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", -6)
+        .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text("Hits");
