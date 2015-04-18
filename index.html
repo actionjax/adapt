@@ -41,10 +41,10 @@ svg {
 
 </style>
 <body>
-<script src="javascripts/d3.v3.min.js"></script>
+<script src="js/d3.v3.min.js"></script>
 <script>
 
-d3.csv("{{adapt_csv}}", 
+d3.csv("data/adapt_prediction.csv", 
   function(error, data) {
 
     function brushed() {
